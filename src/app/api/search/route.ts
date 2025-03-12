@@ -1,8 +1,11 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { NextResponse } from 'next/server';
+import randomUseragent from 'random-useragent';
 
-const BASE_URI = "https://www.gogoanimes.is/";
+// Use HiAnime URL instead of GogoAnime
+const BASE_URI = "https://hianime.to";
+const FALLBACK_URIS = ["https://hianime.sx", "https://hianime.nz"];
 
 interface AnimeItem {
   id: string | null;
@@ -33,35 +36,100 @@ export async function GET(request: Request) {
 
   try {
     console.log(`[API] Searching for anime with query: "${q}"`);
-    const { data } = await axios.get(
-      `${BASE_URI}/search.html?keyword=${encodeURIComponent(q)}`
-    );
+    
+    // Get a random user agent
+    const userAgent = randomUseragent.getRandom();
+    console.log(`[API] Using User-Agent: ${userAgent}`);
+    
+    // Shared headers for all requests
+    const headers = {
+      'User-Agent': userAgent,
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.5',
+      'Referer': 'https://www.google.com/',
+      'DNT': '1',
+      'Connection': 'keep-alive',
+      'Upgrade-Insecure-Requests': '1',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'cross-site',
+      'Pragma': 'no-cache',
+      'Cache-Control': 'no-cache',
+    };
+    
+    // Try main URL first
+    let data;
+    let currentUri = BASE_URI;
+    
+    try {
+      const response = await axios.get(`${currentUri}/search?keyword=${encodeURIComponent(q)}`, { headers });
+      data = response.data;
+    } catch (error) {
+      console.warn(`Error with main URL ${currentUri}:`, error);
+      
+      // Try fallback URLs if main fails
+      for (const fallbackUri of FALLBACK_URIS) {
+        try {
+          console.log(`[API] Trying fallback URL: ${fallbackUri}`);
+          const response = await axios.get(`${fallbackUri}/search?keyword=${encodeURIComponent(q)}`, { headers });
+          data = response.data;
+          currentUri = fallbackUri;
+          break;
+        } catch (fallbackError) {
+          console.warn(`Error with fallback URL ${fallbackUri}:`, fallbackError);
+        }
+      }
+      
+      if (!data) {
+        throw new Error('All URLs failed');
+      }
+    }
     
     const $ = cheerio.load(data);
-    if ($("ul.items").text().match(/Sorry, Not found/g)) {
-      return NextResponse.json(
-        { data: { animes: [] } },
-        { status: 200 }
-      );
-    }
-
+    
+    // Adjust selectors for HiAnime
     const animes: AnimeItem[] = [];
-    $("div.last_episodes ul.items li").each((i: number, el: any) => {
-      const id = $(el).children(".name").children("a").attr("href")?.replace("/category/", "") || null;
+    $(".film_list-wrap .flw-item").each((i: number, el: any) => {
+      const id = $(el).find(".film-detail .film-name a").attr("href")?.split("/").pop() || null;
+      const poster = $(el).find(".film-poster img").attr("data-src") || $(el).find(".film-poster img").attr("src") || null;
+      const name = $(el).find(".film-detail .film-name a").text().trim() || null;
+      
       animes.push({
         id,
-        poster: $(el).children(".img").children("a").children("img").attr("src") || null,
-        name: $(el).children(".name").children("a").attr("title") || null,
-        jname: "", // Gogoanime doesn't provide Japanese names
-        type: "TV", // Default type
+        poster,
+        name,
+        jname: "", // HiAnime doesn't provide Japanese names separately
+        type: $(el).find(".film-detail .fd-infor .fdi-item").first().text().trim() || "TV",
         moreInfo: [
-          $(el).children(".released").text().replace(/Released:/g, "").trim() || null
+          $(el).find(".film-detail .fd-infor .fdi-item").last().text().trim() || null
         ],
-        link: $(el).children(".name").children("a").attr("href") || null,
+        link: $(el).find(".film-detail .film-name a").attr("href") || null,
       });
     });
 
-    console.log(`[API] Found ${animes.length} results for query: "${q}"`);
+    // If no results found with the new selector, try an alternative selector
+    if (animes.length === 0) {
+      console.log("[API] Trying alternative selector for HiAnime");
+      $(".ani.items .item").each((i: number, el: any) => {
+        const id = $(el).find("a").attr("href")?.split("/").pop() || null;
+        const poster = $(el).find("img").attr("src") || null;
+        const name = $(el).find(".name").text().trim() || null;
+        
+        animes.push({
+          id,
+          poster,
+          name,
+          jname: "", 
+          type: "TV", // Default type
+          moreInfo: [
+            $(el).find(".released").text().trim() || null
+          ],
+          link: $(el).find("a").attr("href") || null,
+        });
+      });
+    }
+
+    console.log(`[API] Found ${animes.length} results for query: "${q}" using ${currentUri}`);
     return NextResponse.json(
       { data: { animes } },
       { status: 200 }

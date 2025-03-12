@@ -2,7 +2,9 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { NextResponse } from 'next/server';
 
-const BASE_URI = "https://www.gogoanimes.is/";
+// Use HiAnime URL instead of GogoAnime
+const BASE_URI = "https://hianime.to";
+const FALLBACK_URIS = ["https://hianime.sx", "https://hianime.nz"];
 
 interface SuggestionItem {
   id: string | null;
@@ -33,38 +35,85 @@ export async function GET(request: Request) {
 
   try {
     console.log(`[API] Searching for anime suggestions with query: "${q}"`);
-    const { data } = await axios.get(
-      `${BASE_URI}/search.html?keyword=${encodeURIComponent(q)}`
-    );
+    
+    // Try main URL first
+    let data;
+    let currentUri = BASE_URI;
+    
+    try {
+      const response = await axios.get(`${currentUri}/search?keyword=${encodeURIComponent(q)}`);
+      data = response.data;
+    } catch (error) {
+      console.warn(`Error with main URL ${currentUri}:`, error);
+      
+      // Try fallback URLs if main fails
+      for (const fallbackUri of FALLBACK_URIS) {
+        try {
+          console.log(`[API] Trying fallback URL: ${fallbackUri}`);
+          const response = await axios.get(`${fallbackUri}/search?keyword=${encodeURIComponent(q)}`);
+          data = response.data;
+          currentUri = fallbackUri;
+          break;
+        } catch (fallbackError) {
+          console.warn(`Error with fallback URL ${fallbackUri}:`, fallbackError);
+        }
+      }
+      
+      if (!data) {
+        throw new Error('All URLs failed');
+      }
+    }
     
     const $ = cheerio.load(data);
-    if ($("ul.items").text().match(/Sorry, Not found/g)) {
-      return NextResponse.json(
-        { data: { suggestions: [] } },
-        { status: 200 }
-      );
-    }
-
+    
+    // Adjust selectors for HiAnime
     const suggestions: SuggestionItem[] = [];
-    $("div.last_episodes ul.items li").each((i: number, el: any) => {
+    $(".film_list-wrap .flw-item").each((i: number, el: any) => {
       // Only include first 8 suggestions for dropdown
       if (i < 8) {
-        const id = $(el).children(".name").children("a").attr("href")?.replace("/category/", "") || null;
+        const id = $(el).find(".film-detail .film-name a").attr("href")?.split("/").pop() || null;
+        const poster = $(el).find(".film-poster img").attr("data-src") || $(el).find(".film-poster img").attr("src") || null;
+        const name = $(el).find(".film-detail .film-name a").text().trim() || null;
+        
         suggestions.push({
           id,
-          poster: $(el).children(".img").children("a").children("img").attr("src") || null,
-          name: $(el).children(".name").children("a").attr("title") || null,
-          jname: "", // Gogoanime doesn't provide Japanese names
-          type: "TV", // Default type
-          rank: $(el).children(".released").text().replace(/Released:/g, "").trim() || null,
+          poster,
+          name,
+          jname: "", // HiAnime doesn't provide Japanese names separately
+          type: $(el).find(".film-detail .fd-infor .fdi-item").first().text().trim() || "TV",
+          rank: $(el).find(".film-detail .fd-infor .fdi-item").last().text().trim() || null,
           moreInfo: [
-            $(el).children(".released").text().replace(/Released:/g, "").trim() || null
+            $(el).find(".film-detail .fd-infor .fdi-item").last().text().trim() || null
           ]
         });
       }
     });
 
-    console.log(`[API] Found ${suggestions.length} suggestion results for query: "${q}"`);
+    // If no results found with the new selector, try an alternative selector
+    if (suggestions.length === 0) {
+      console.log("[API] Trying alternative selector for HiAnime");
+      $(".ani.items .item").each((i: number, el: any) => {
+        if (i < 8) {
+          const id = $(el).find("a").attr("href")?.split("/").pop() || null;
+          const poster = $(el).find("img").attr("src") || null;
+          const name = $(el).find(".name").text().trim() || null;
+          
+          suggestions.push({
+            id,
+            poster,
+            name,
+            jname: "", 
+            type: "TV", // Default type
+            rank: $(el).find(".released").text().trim() || null,
+            moreInfo: [
+              $(el).find(".released").text().trim() || null
+            ]
+          });
+        }
+      });
+    }
+
+    console.log(`[API] Found ${suggestions.length} suggestion results for query: "${q}" using ${currentUri}`);
     return NextResponse.json(
       { data: { suggestions } },
       { status: 200 }

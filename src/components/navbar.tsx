@@ -41,11 +41,9 @@ const NavBar = () => {
     <div
       className={cn([
         "h-fit w-full",
-        "sticky top-0 z-[100] duration-300",
-        isHeaderFixed ? "fixed bg-gradient-to-b from-slate-700" : "",
-        isHeaderSticky
-          ? "bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 bg-slate-900"
-          : "",
+        "sticky top-0 z-[100]",
+        isHeaderFixed ? "fixed bg-cs-window border-b border-cs-border" : "",
+        isHeaderSticky ? "bg-cs-window border-b border-cs-border" : "",
       ])}
     >
       <Container className="flex items-center justify-between py-2 gap-20 ">
@@ -53,14 +51,10 @@ const NavBar = () => {
           href={ROUTES.HOME}
           className="flex items-center gap-1 cursor-pointer"
         >
-          <Image src="/icon.png" alt="logo" width={70} height={70} />
           <h1
-            className={cn([
-              nightTokyo.className,
-              "text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-pink-600 tracking-widest",
-            ])}
+            className="text-2xl font-bold text-cs-text tracking-widest"
           >
-            Kitsunee
+            muni player
           </h1>
         </Link>
         <div className="hidden lg:flex items-center gap-10 ml-20">

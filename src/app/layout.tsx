@@ -1,4 +1,5 @@
 import "./globals.css";
+import "../styles/react-player.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
@@ -20,9 +21,9 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-const APP_NAME = "Kitsune";
-const APP_DEFAULT_TITLE = "Kitsune | Anime Streaming";
-const APP_DESCRIPTION = "Stream your favourite anime with ease and no ads";
+const APP_NAME = "muni stream";
+const APP_DEFAULT_TITLE = "muni stream";
+const APP_DESCRIPTION = "muni stream";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,

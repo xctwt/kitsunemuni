@@ -15,57 +15,78 @@ body {
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 0 0% 0%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 95%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 0 0% 0%;
+    --radius: 0rem;
+    --chart-1: 0 0% 20%;
+    --chart-2: 0 0% 40%;
+    --chart-3: 0 0% 60%;
+    --chart-4: 0 0% 80%;
+    --chart-5: 0 0% 100%;
+    
+    /* Custom theme variables */
+    --cs-bg: #ffffff;
+    --cs-window: #ffffff;
+    --cs-border: #000000;
+    --cs-text: #000000;
+    --cs-hover: rgba(0, 0, 0, 0.1);
+    --cs-text-rgb: (0, 0, 0);
+    --shadow: rgba(0, 0, 0, 0.1);
+    --desktop-icon-bg: rgba(255, 255, 255, 0.3);
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100%;
+    --input: 0 0% 100%;
+    --ring: 0 0% 100%;
+    --radius: 0rem;
+    --chart-1: 0 0% 100%;
+    --chart-2: 0 0% 80%;
+    --chart-3: 0 0% 60%;
+    --chart-4: 0 0% 40%;
+    --chart-5: 0 0% 20%;
+    
+    /* Custom theme variables */
+    --cs-bg: #000000;
+    --cs-window: #000000;
+    --cs-border: #ffffff;
+    --cs-text: #ffffff;
+    --cs-hover: rgba(255, 255, 255, 0.1);
+    --cs-text-rgb: (255, 255, 255);
+    --shadow: rgba(255, 255, 255, 0.1);
+    --desktop-icon-bg: rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -76,4 +97,371 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Disable all animations EXCEPT for elements with EXPLICITLY allowed animations */
+*:not(.allow-animation, .allow-animation *, [data-carousel], [data-carousel] *, .carousel, .carousel *, .embla, .embla *, [class*="carousel-"], [class*="carousel-"] *, .art-custom-loading, .art-spinner, .react-player-wrapper, .react-player-wrapper *) {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Force no border-radius on any element */
+* {
+  border-radius: 0 !important;
+}
+
+/* EXPLICITLY allow carousel animations */
+.allow-animation,
+.allow-animation *,
+[data-carousel],
+[data-carousel] *,
+.carousel,
+.carousel *,
+.embla,
+.embla *,
+[class*="carousel-"],
+[class*="carousel-"] *,
+.art-custom-loading,
+.art-spinner,
+.react-player-wrapper, 
+.react-player-wrapper * {
+  animation: initial !important;
+  transition: all 300ms ease-in-out !important;
+  transform: initial !important;
+}
+
+/* React Player Custom Styles */
+.art-custom-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.art-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  border: 5px solid rgba(255, 255, 255, 0.2);
+  border-top-color: white;
+  animation: spinner 1s linear infinite !important;
+}
+
+@keyframes spinner {
+  to {transform: rotate(360deg) !important;}
+}
+
+/* Player Controls Style */
+.react-player video::-webkit-media-controls-enclosure {
+  border: 1px solid var(--cs-border) !important;
+  background-color: var(--cs-window) !important;
+}
+
+.react-player video::-webkit-media-controls-panel {
+  background-color: var(--cs-window) !important;
+}
+
+.react-player video::-webkit-media-controls-play-button,
+.react-player video::-webkit-media-controls-timeline,
+.react-player video::-webkit-media-controls-volume-slider,
+.react-player video::-webkit-media-controls-volume-slider-container,
+.react-player video::-webkit-media-controls-toggle-closed-captions-button,
+.react-player video::-webkit-media-controls-fullscreen-button {
+  border: 1px solid var(--cs-border) !important;
+}
+
+/* Base Styles for UI Components */
+.cs-button {
+  background: var(--cs-window);
+  border: 1px solid var(--cs-border);
+  color: var(--cs-text);
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0;
+}
+
+.cs-button:hover {
+  background: var(--cs-hover);
+}
+
+.cs-button-active {
+  background: var(--cs-hover);
+  border: 2px solid var(--cs-text);
+  padding: 3px 7px;
+}
+
+.app {
+  background-color: var(--cs-bg);
+  min-height: 100vh;
+  transition: background-color 0.3s ease;
+}
+
+.cs-window {
+  background: var(--cs-window);
+  border: 1px solid var(--cs-border);
+  border-radius: 0;
+  box-shadow: 0 0 10px var(--shadow);
+  color: var(--cs-text);
+}
+
+.cs-titlebar {
+  background: var(--cs-window);
+  border-bottom: 1px solid var(--cs-border);
+  padding: 4px 8px;
+  font-weight: bold;
+  cursor: move;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cs-content {
+  padding: 8px;
+}
+
+.cs-close-button {
+  background: none;
+  color: var(--cs-text);
+  width: 20px;
+  height: 20px;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 5px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+}
+
+.cs-close-button:hover {
+  background: var(--cs-hover);
+}
+
+.cs-input {
+  background: var(--cs-window);
+  border: 1px solid var(--cs-border);
+  color: var(--cs-text);
+  padding: 4px;
+  width: 100%;
+  border-radius: 0;
+}
+
+.cs-select {
+  background: var(--cs-window);
+  border: 1px solid var(--cs-border);
+  color: var(--cs-text);
+  padding: 4px 8px;
+  cursor: pointer;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border-radius: 0;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 32px;
+}
+
+.cs-select:hover {
+  background-color: var(--cs-hover);
+}
+
+.cs-select:focus {
+  outline: none;
+  border-color: var(--cs-text);
+}
+
+.cs-select option {
+  background: var(--cs-window);
+  color: var(--cs-text);
+}
+
+/* Progress bar styles */
+.progress-bar {
+  height: 4px;
+  background: var(--cs-hover);
+  position: relative;
+  border-radius: 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--cs-border);
+  transition: width 0.1s linear;
+  border-radius: 0;
+}
+
+/* Input range styles */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+  height: 4px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  background: var(--cs-border);
+  border: none;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 4px;
+  background: var(--shadow);
+  border: none;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 10px;
+  width: 10px;
+  background: var(--cs-window);
+  border: 1px solid var(--cs-border);
+  margin-top: -3px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 10px;
+  width: 10px;
+  background: var(--cs-window);
+  border: 1px solid var(--cs-border);
+  cursor: pointer;
+  border-radius: 0;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+input[type="range"]:focus::-webkit-slider-runnable-track {
+  background: var(--cs-border);
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  border-color: var(--cs-text);
+}
+
+input[type="range"]:hover::-moz-range-thumb {
+  border-color: var(--cs-text);
+}
+
+/* Helper classes */
+.border-cs-text {
+  border-color: var(--cs-text);
+}
+
+.border-cs-border {
+  border-color: var(--cs-border);
+}
+
+/* Playlist styles */
+.playlist-item {
+  background: var(--cs-window);
+  color: var(--cs-text);
+  border: 1px solid var(--cs-border);
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.playlist-item:hover {
+  background: var(--cs-hover);
+}
+
+.playlist-item.active {
+  background: var(--cs-hover);
+  border-color: var(--cs-text);
+}
+
+/* Video Player Custom Styles */
+.art-video-player {
+  background-color: var(--cs-window) !important;
+  color: var(--cs-text) !important;
+  border: 1px solid var(--cs-border) !important;
+}
+
+.art-bottom {
+  border-top: 1px solid var(--cs-border) !important;
+}
+
+.art-control-volume-panel {
+  background-color: var(--cs-window) !important;
+  border: 1px solid var(--cs-border) !important;
+}
+
+.art-control-volume-panel .art-control-volume-inner {
+  background-color: var(--cs-hover) !important;
+}
+
+.art-control-volume-panel .art-control-volume-inner .art-control-volume-thumb {
+  background-color: var(--cs-text) !important;
+}
+
+.art-control-progress-played {
+  background-color: var(--cs-border) !important;
+}
+
+.art-control-progress-highlight {
+  background-color: var(--cs-text) !important;
+  opacity: 0.5;
+}
+
+.art-video-player .art-subtitle {
+  color: var(--cs-text) !important;
+  text-shadow: 1px 1px 1px var(--cs-bg) !important;
+}
+
+/* Remove all gradients */
+[class*="gradient"]:not([style*="background-image: url"]), 
+[class*="bg-gradient"]:not([style*="background-image: url"]), 
+div[style*="gradient"]:not([style*="background-image: url"]) {
+  background: var(--cs-window) !important;
+  background-image: none !important;
+}
+
+/* Preserve image backgrounds while removing gradient overlays */
+div[style*="background-image: url"] {
+  background-image: var(--original-bg-image, inherit) !important;
+}
+
+/* Specific fixes for elements with gradients */
+.navbar-gradient,
+.hero-gradient {
+  background: var(--cs-window) !important;
+  background-image: none !important;
+}
+
+/* Carousel Navigation Styles */
+.embla__button {
+  background-color: var(--cs-window) !important;
+  border: 1px solid var(--cs-border) !important;
+  color: var(--cs-text) !important;
+  z-index: 50 !important;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.embla__button:hover {
+  background-color: var(--cs-hover) !important;
 }

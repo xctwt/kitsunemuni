@@ -52,9 +52,12 @@ const config: Config = {
 				}
 			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				lg: '0rem',
+				md: '0rem',
+				sm: '0rem',
+				DEFAULT: '0rem',
+				'none': '0rem',
+				'full': '0rem'
 			}
 		}
 	},

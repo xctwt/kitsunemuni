@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useAnimeStore } from "@/store/anime-store";
 
 import { IWatchedAnime } from "@/types/watched-anime";
-import KitsunePlayer from "@/components/kitsune-player";
+import VideoPlayer from "@/components/video-player";
 import { useGetEpisodeData } from "@/query/get-episode-data";
 import { useGetEpisodeServers } from "@/query/get-episode-servers";
 import { getFallbackServer } from "@/utils/fallback-server";
@@ -100,16 +100,39 @@ const VideoPlayerSection = () => {
       <div className="min-h-[20vh] sm:min-h-[30vh] max-h-[60vh] md:min-h-[40vh] lg:min-h-[60vh] w-full animate-pulse bg-slate-700 rounded-md"></div>
     );
 
+  // Check if sources array exists and has items
+  if (!episodeData.sources || episodeData.sources.length === 0) {
+    return (
+      <div className="min-h-[30vh] w-full flex items-center justify-center bg-cs-window rounded-md">
+        <div className="text-center p-5">
+          <h3 className="text-xl font-bold text-red-500 mb-2">No Video Sources Available</h3>
+          <p className="text-cs-text">Unable to load video sources for this episode. Please try another server.</p>
+          <div className="mt-4">
+            {serversData?.sub.map((s, i) => (
+              <Button
+                key={i}
+                className={`m-1 uppercase font-bold`}
+                onClick={() => changeServer(s.serverName, "sub")}
+              >
+                Try {s.serverName}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      <KitsunePlayer
-        key={episodeData?.sources[0].url}
-        episodeInfo={episodeData!}
+      <VideoPlayer
+        key={episodeData.sources[0]?.url || `episode-${selectedEpisode}-${serverName}-${key}`}
+        episodeInfo={episodeData}
         animeInfo={{
           title: anime.anime.info.name,
           image: anime.anime.info.poster,
         }}
-        subOrDub={key}
+        subOrDub={key as "sub" | "dub"}
       />
       <div className="bg-[#0f172a] p-5">
         <div className="flex flex-row items-center space-x-5">
@@ -117,7 +140,6 @@ const VideoPlayerSection = () => {
           <p className="font-bold text-sm">SUB</p>
           {serversData?.sub.map((s, i) => (
             <Button
-              size="sm"
               key={i}
               className={`uppercase font-bold ${serverName === s.serverName && key === "sub" && "bg-red-300"}`}
               onClick={() => changeServer(s.serverName, "sub")}
@@ -132,7 +154,6 @@ const VideoPlayerSection = () => {
             <p className="font-bold text-sm">DUB</p>
             {serversData?.dub.map((s, i) => (
               <Button
-                size="sm"
                 key={i}
                 className={`uppercase font-bold ${serverName === s.serverName && key === "dub" && "bg-green-300"}`}
                 onClick={() => changeServer(s.serverName, "dub")}

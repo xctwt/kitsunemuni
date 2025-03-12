@@ -26,34 +26,103 @@ type IHeroSectionProps = {
 
 const HeroSection = (props: IHeroSectionProps) => {
   const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+  const [translateX, setTranslateX] = React.useState(0);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const totalItems = props?.spotlightAnime?.length || 0;
+
+  React.useEffect(() => {
+    if (!api) return;
+    
+    const onSelect = () => {
+      setCurrent(api.selectedScrollSnap());
+    };
+    
+    api.on('select', onSelect);
+    api.on('reInit', onSelect);
+    
+    return () => {
+      api.off('select', onSelect);
+      api.off('reInit', onSelect);
+    };
+  }, [api]);
+
+  const handlePrev = React.useCallback(() => {
+    if (api) {
+      api.scrollPrev();
+      // Manual animation if CSS transitions are disabled
+      if (contentRef.current) {
+        const width = contentRef.current.clientWidth;
+        setTranslateX(prev => prev + width);
+      }
+    }
+  }, [api]);
+
+  const handleNext = React.useCallback(() => {
+    if (api) {
+      api.scrollNext();
+      // Manual animation if CSS transitions are disabled
+      if (contentRef.current) {
+        const width = contentRef.current.clientWidth;
+        setTranslateX(prev => prev - width);
+      }
+    }
+  }, [api]);
 
   if (props.isDataLoading) return <LoadingSkeleton />;
 
   return (
     <div className="h-[80vh] w-full relative">
-      <Carousel className="w-full" setApi={setApi} opts={{}}>
-        <CarouselContent className="">
-          {props?.spotlightAnime.map((anime, index) => (
-            <CarouselItem key={index}>
-              <HeroCarouselItem anime={anime} />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+      <div className="allow-animation w-full">
+        <Carousel 
+          className="w-full carousel" 
+          setApi={setApi} 
+          opts={{ 
+            loop: true,
+            dragFree: true,
+            skipSnaps: false,
+            align: 'start',
+            watchDrag: true,
+          }}
+          data-carousel
+        >
+          <CarouselContent 
+            className="carousel-content" 
+            ref={contentRef}
+            style={{
+              transform: `translateX(${translateX}px)`
+            }}
+            data-carousel-content
+          >
+            {props?.spotlightAnime.map((anime, index) => (
+              <CarouselItem 
+                key={index} 
+                className="carousel-item" 
+                data-carousel-item
+                style={{ minWidth: '100%', flexShrink: 0 }}
+              >
+                <HeroCarouselItem anime={anime} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
       <div className="absolute hidden md:flex items-center gap-5 right-10 3xl:bottom-10 bottom-24 z-50 isolate">
         <Button
-          onClick={() => {
-            api?.scrollPrev();
-          }}
-          className="rounded-full bg-transparent border border-white h-10 w-10 hover:bg-slate-500"
+          onClick={handlePrev}
+          className="border border-cs-border bg-cs-window text-cs-text h-10 w-10 hover:bg-cs-hover carousel-button"
+          type="button"
+          data-carousel-button="prev"
         >
-          <ArrowLeft className="text-white shrink-0" />
+          <ArrowLeft className="shrink-0" />
         </Button>
         <Button
-          onClick={() => api?.scrollNext()}
-          className="rounded-full bg-transparent border border-white h-10 w-10 hover:bg-slate-500"
+          onClick={handleNext}
+          className="border border-cs-border bg-cs-window text-cs-text h-10 w-10 hover:bg-cs-hover carousel-button"
+          type="button"
+          data-carousel-button="next"
         >
-          <ArrowRight className="text-white shrink-0" />
+          <ArrowRight className="shrink-0" />
         </Button>
       </div>
     </div>
@@ -61,62 +130,32 @@ const HeroSection = (props: IHeroSectionProps) => {
 };
 
 const HeroCarouselItem = ({ anime }: { anime: SpotlightAnime }) => {
-  // const [isHovered, setIsHovered] = useState(false);
-
-  // const hoverTimeoutRef = React.useRef<NodeJS.Timeout | null>(null); // Use ref to store the timeout ID
-
-  // const handleMouseEnter = () => {
-  //   hoverTimeoutRef.current = setTimeout(() => {
-  //     setIsHovered(true);
-  //   }, 1500);
-  // };
-
-  // const handleMouseLeave = () => {
-  //   if (hoverTimeoutRef.current) {
-  //     clearTimeout(hoverTimeoutRef.current); // Clear the timeout when mouse leaves
-  //   }
-  //   setIsHovered(false);
-  // };
-
   return (
     <div
-      className={`w-full bg-cover bg-no-repeat bg-center h-[80vh] relative`}
-      style={{ backgroundImage: `url(${anime?.poster})` }}
-    // onMouseEnter={handleMouseEnter}
-    // onMouseLeave={handleMouseLeave}
+      className="w-full h-[80vh] relative overflow-hidden"
     >
-      {/* {isHovered && (
-        <div className="absolute inset-0 z-0">
-          <iframe
-            className="w-full h-full object-cover"
-            src={`https://www.youtube.com/embed/${anime?.trailer.id}?autoplay=1&mute=0&controls=0&modestbranding=1`}
-            title="YouTube video player"
-            allow="autoplay; encrypted-media"
-            allowFullScreen
-          ></iframe>
-        </div>
-      )} */}
-
-      {/* Gradient Overlay */}
-      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-r from-slate-900 to-transparent z-10"></div>
-      <div className="absolute h-full w-full inset-0 m-auto bg-gradient-to-t from-slate-900 to-transparent z-10"></div>
-
-      {/* Content Section (remains outside the hover area) */}
-      <div className="w-full h-[calc(100%-5.25rem)]  relative z-20">
-        <Container className="w-full h-full flex flex-col justify-end md:justify-center pb-10">
-          <div className="space-y-2 lg:w-[40vw]">
-            {/* Title and description moved inside the hover area */}
+      {/* Background Image - No overlay */}
+      <img 
+        src={anime?.poster} 
+        alt={anime?.name}
+        className="absolute inset-0 w-full h-full object-cover object-center"
+      />
+      
+      {/* Content Section with improved visibility */}
+      <div className="w-full h-full flex items-end md:items-center relative z-20">
+        <Container className="w-full py-10">
+          <div className="space-y-2 lg:w-[40vw] bg-cs-window/80 dark:bg-cs-window/80 p-4 border border-cs-border backdrop-blur-sm">
             <h1 className="text-4xl font-black">{anime?.name}</h1>
 
             <div className="flex flex-row items-center space-x-2 ">
               {anime.episodes.sub && (
-                <Badge className="bg-red-200 flex flex-row items-center space-x-0.5">
+                <Badge className="bg-transparent border-cs-border text-cs-text flex flex-row items-center space-x-0.5">
                   <Captions size={"16"} />
                   <span>{anime.episodes.sub}</span>
                 </Badge>
               )}
               {anime.episodes.dub && (
-                <Badge className="bg-green-200 flex flex-row items-center space-x-0.5">
+                <Badge className="bg-transparent border-cs-border text-cs-text flex flex-row items-center space-x-0.5">
                   <Mic size={"16"} />
                   <span>{anime.episodes.dub}</span>
                 </Badge>
@@ -129,13 +168,10 @@ const HeroCarouselItem = ({ anime }: { anime: SpotlightAnime }) => {
             <div className="flex items-center gap-5 !mt-5">
               <ButtonLink
                 href={`${ROUTES.ANIME_DETAILS}/${anime.id}`}
-                className="h-10 text-md bg-[#e9376b] text-white hover:bg-[#e9376b]"
+                className="h-10 text-md bg-cs-window border border-cs-border text-cs-text hover:bg-cs-hover"
               >
                 Learn More
               </ButtonLink>
-              {/* <ButtonLink href={`${ROUTES.WATCH}?anime=${anime.id}&episode=${}`} className="h-10 text-md" variant={"secondary"}>
-                Watch
-              </ButtonLink> */}
             </div>
           </div>
         </Container>
@@ -150,18 +186,18 @@ const LoadingSkeleton = () => {
       <div className="w-full h-[calc(100%-5.25rem)] mt-[5.25rem] relative z-20">
         <Container className="w-full h-full flex flex-col justify-end md:justify-center pb-10">
           <div className="space-y-2 lg:w-[40vw]">
-            <div className="h-16 animate-pulse bg-slate-700 w-[75%]"></div>
-            <div className="h-40 animate-pulse w-full bg-slate-700"></div>
+            <div className="h-16 bg-secondary w-[75%]"></div>
+            <div className="h-40 w-full bg-secondary"></div>
             <div className="flex items-center gap-5">
-              <span className="h-10 w-[7.5rem] animate-pulse bg-slate-700"></span>
-              <span className="h-10 w-[7.5rem] animate-pulse bg-slate-700"></span>
+              <span className="h-10 w-[7.5rem] bg-secondary"></span>
+              <span className="h-10 w-[7.5rem] bg-secondary"></span>
             </div>
           </div>
         </Container>
       </div>
       <div className="absolute hidden md:flex items-center gap-5 right-10 bottom-0 z-50 isolate">
-        <span className="h-10 w-10 rounded-full animate-pulse bg-slate-700"></span>
-        <span className="h-10 w-10 rounded-full animate-pulse bg-slate-700"></span>
+        <span className="h-10 w-10 bg-secondary"></span>
+        <span className="h-10 w-10 bg-secondary"></span>
       </div>
     </div>
   );

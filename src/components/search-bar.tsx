@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Input } from "./ui/input";
 import { SearchIcon } from "lucide-react";
 import useDebounce from "@/hooks/use-debounce";
@@ -19,11 +19,25 @@ const SearchBar = ({
 }) => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const debouncedValue = useDebounce(searchValue, 1000);
   const resultsRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  const { data: searchResults, isLoading } = useSearchAnime(debouncedValue);
+  const { data: searchResults, isLoading, error } = useSearchAnime(debouncedValue);
+
+  // Clear error when search value changes
+  useEffect(() => {
+    if (searchError) setSearchError(null);
+  }, [searchValue]);
+
+  // Set error message if search request fails
+  useEffect(() => {
+    if (error) {
+      console.error('Search error:', error);
+      setSearchError('Search is currently unavailable. Please try again later.');
+    }
+  }, [error]);
 
   const handleBlur = () => {
     setTimeout(() => {
@@ -70,7 +84,12 @@ const SearchBar = ({
         value={searchValue}
         onKeyDown={handleKeyDown}
       />
-      {isFocused && searchValue && (
+      {searchError && searchValue && (
+        <div className="absolute w-full p-2 mt-1 text-red-400 bg-secondary border border-red-500 rounded-md">
+          {searchError}
+        </div>
+      )}
+      {isFocused && searchValue && !searchError && (
         <div
           ref={resultsRef}
           className="absolute w-full max-h-[40vh] hidden lg:flex overflow-y-auto flex-col gap-5 px-5 py-5 bg-secondary top-[110%] rounded-md"

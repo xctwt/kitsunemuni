@@ -1,5 +1,5 @@
 import { SEARCH_ANIME } from "@/constants/query-keys";
-import { api } from "@/lib/api";
+import { getSearchResults } from "@/lib/api";
 import { IAnime } from "@/types/anime";
 import { useQuery } from "react-query";
 
@@ -10,11 +10,7 @@ const searchAnime = async (q: string) => {
   
   try {
     console.log(`Fetching search results for query: "${q}"`);
-    const res = await api.get("/search", {
-      params: {
-        q: q,
-      },
-    });
+    const res = await getSearchResults(q);
     
     console.log(`Search results received with ${res.data?.data?.animes?.length || 0} results`);
     return res.data.data.animes as IAnime[];

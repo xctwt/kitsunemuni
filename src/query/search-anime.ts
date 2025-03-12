@@ -1,5 +1,5 @@
 import { SEARCH_ANIME } from "@/constants/query-keys";
-import { api } from "@/lib/api";
+import { getSearchSuggestions } from "@/lib/api";
 import { ISuggestionAnime } from "@/types/anime";
 import { useQuery } from "react-query";
 
@@ -10,11 +10,7 @@ const searchAnime = async (q: string) => {
   
   try {
     console.log(`Searching anime with query: "${q}"`);
-    const res = await api.get("/search/suggestion", {
-      params: {
-        q: q,
-      },
-    });
+    const res = await getSearchSuggestions(q);
     
     console.log(`Search response received with ${res.data?.data?.suggestions?.length || 0} results`);
     return res.data.data.suggestions as ISuggestionAnime[];

@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { NextResponse } from 'next/server';
 
-const BASE_URI = "https://www1.gogoanime.ai";
+const BASE_URI = "https://anitaku.bz/";
 
 interface SuggestionItem {
   id: string | null;

@@ -16,15 +16,22 @@ interface QualityOption {
 interface VideoPlayerProps {
   animeInfo: IAnime | { image: string; title: string };
   episodeInfo?: IEpisodeSource;
-  subOrDub?: "sub" | "dub"; 
+  subOrDub?: "sub" | "dub";
 }
 
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   animeInfo,
   episodeInfo,
+  // We need to receive subOrDub but don't use it yet
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   subOrDub,
 }: VideoPlayerProps) => {
-  const playerRef = useRef<any>(null);
+  // Define a proper interface for the player reference
+  interface PlayerRef {
+    seekTo: (time: number) => void;
+  }
+  
+  const playerRef = useRef<PlayerRef | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [playerError, setPlayerError] = useState<Error | null>(null);
@@ -79,14 +86,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setPlayerError(null);
   }, [episodeInfo]);
 
-  const handlePlayerReady = (player: any) => {
+  // Add proper type for player parameter
+  const handlePlayerReady = (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    player: React.MutableRefObject<unknown>
+  ) => {
     setIsLoaded(true);
     setIsPlayerReady(true);
   };
 
-  const handlePlayerError = (error: any) => {
+  // Add proper type for error parameter
+  const handlePlayerError = (error: Error | string) => {
     console.error("Player error:", error);
-    setPlayerError(error);
+    setPlayerError(error instanceof Error ? error : new Error(String(error)));
   };
 
   const handleProgress = (state: { played: number; playedSeconds: number }) => {

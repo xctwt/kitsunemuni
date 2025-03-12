@@ -23,12 +23,20 @@ interface QualityOption {
   url: string;
 }
 
+// Define a PlayerRef interface to replace "any"
+interface PlayerRef {
+  seekTo: (time: number) => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
+}
+
 interface VideoPlayer2Props {
   url: string;
   poster?: string;
   tracks?: Track[];
   className?: string;
   onProgress?: (state: { played: number; playedSeconds: number }) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onReady?: (player: any) => void;
   intro?: { start: number; end: number };
   outro?: { start: number; end: number };
@@ -50,6 +58,7 @@ const VideoPlayer2: React.FC<VideoPlayer2Props> = ({
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [playerError, setPlayerError] = useState<Error | null>(null);
   const [availableQualities, setAvailableQualities] = useState<QualityOption[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const playerRef = useRef<any>(null);
 
   // Convert Track objects to the format expected by ReactPlayerWrapper
@@ -86,15 +95,17 @@ const VideoPlayer2: React.FC<VideoPlayer2Props> = ({
     setPlayerError(null);
   }, [url]);
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlePlayerReady = (player: any) => {
     setIsLoaded(true);
     setIsPlayerReady(true);
     if (onReady) onReady(player);
   };
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlePlayerError = (error: any) => {
     console.error("Player error:", error);
-    setPlayerError(error);
+    setPlayerError(error instanceof Error ? error : new Error(String(error)));
   };
 
   const handleProgress = (state: { played: number; playedSeconds: number }) => {

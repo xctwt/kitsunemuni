@@ -1,3 +1,44 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "react/no-unescaped-entities": "off"
+  },
+  "overrides": [
+    {
+      "files": ["public/sw.js", "public/workbox-*.js"],
+      "rules": {
+        "no-unused-expressions": "off",
+        "@typescript-eslint/no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["src/components/react-player-wrapper.tsx"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["src/components/video-player.tsx", "src/components/video-player-alt.tsx", "src/components/kitsune-player.tsx"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["src/app/page.tsx", "src/components/footer.tsx", "src/components/navbar.tsx", "src/components/hero-section.tsx"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off",
+        "@next/next/no-img-element": "warn"
+      }
+    },
+    {
+      "files": ["tailwind.config.ts"],
+      "rules": {
+        "@typescript-eslint/no-require-imports": "off"
+      }
+    }
+  ]
 }

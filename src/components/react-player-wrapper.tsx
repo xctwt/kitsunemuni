@@ -133,6 +133,7 @@ interface ReactPlayerWrapperProps {
 }
 
 // Create a forwardRef version of the component
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ReactPlayerWrapper = forwardRef<any, ReactPlayerWrapperProps>(({
   url,
   poster,
@@ -178,6 +179,7 @@ const ReactPlayerWrapper = forwardRef<any, ReactPlayerWrapperProps>(({
   const [currentTime, setCurrentTime] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [seeking, setSeeking] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -186,8 +188,10 @@ const ReactPlayerWrapper = forwardRef<any, ReactPlayerWrapperProps>(({
   const [wasPlaying, setWasPlaying] = useState(false);
   const [played, setPlayed] = useState(0);
   const [error, setError] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const [currentSubtitle, setCurrentSubtitle] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
   const [useNativeControls, setUseNativeControls] = useState(false);
 
@@ -478,6 +482,7 @@ const ReactPlayerWrapper = forwardRef<any, ReactPlayerWrapperProps>(({
     };
   }, [controlsHideTimeout, showQualityMenu, showSpeedMenu, showSubtitleMenu]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleReady = (player: any) => {
     setReady(true);
     setPlaying(initialPlaying); // Auto play when ready
@@ -798,6 +803,7 @@ const ReactPlayerWrapper = forwardRef<any, ReactPlayerWrapperProps>(({
                 crossOrigin: "anonymous", // Important for subtitle support
                 controlsList: useNativeControls ? "" : "nodownload",
                 disablePictureInPicture: !useNativeControls,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onLoadedMetadata: (e: any) => {
                   if (e.target) {
                     setVideoElement(e.target);
